@@ -31,28 +31,6 @@ $d = $p * $maxrowsperpage;
 
 if ($id > 0 || !empty($al))
 {
-   
-    if($id > 0){
-       $where_prev = " item_userid='".$usr['id']."' && item_id < $id ";
-       $where_next = " item_userid='".$usr['id']."' && item_id > $id ";
-       $_t_T = "num";
-    }elseif(!empty($al)){
-       $cur = $db->query("SELECT item_id, item_alias FROM $db_folio WHERE item_alias = '$al' LIMIT 1 ")->fetch();
-       $where_prev = " item_userid='".$usr['id']."' && item_id < ".$cur['item_id'];
-       $where_next = " item_userid='".$usr['id']."' && item_id > ".$cur['item_id']; 
-       $_t_T = "abc";
-    }
-    #$sql = $db->query(" SELECT rownumb,item_id FROM ( SELECT @rownumb := @rownumb+1 AS rownumb, item_id FROM $db_folio AS folio, (SELECT @rownumb := 0) al WHERE $where) AS src ");
-    $sql_prev = $db->query("SELECT item_id, item_alias FROM $db_folio WHERE $where_prev ORDER BY `item_id` DESC LIMIT 1 ")->fetch();
-    $sql_next = $db->query("SELECT item_id, item_alias FROM $db_folio WHERE $where_next ORDER BY `item_id` ASC LIMIT 1 ")->fetch();
-   
-    if($_t_T == "abc"){
-        $prd_prev = $sql_prev["item_alias"];
-        $prd_next = $sql_next["item_alias"];
-    }else{
-        $prd_prev = $sql_prev["item_id"];
-        $prd_next = $sql_next["item_id"];
-    }
     
     /* === Hook === */
 foreach (cot_getextplugins('folio.first') as $pl)
@@ -73,6 +51,29 @@ if (!$id && empty($al) || !$sql || $sql->rowCount() == 0)
 	cot_die_message(404, TRUE);
 }
 $item = $sql->fetch();
+$owner = $item["user_id"];
+
+if($id > 0){
+       $where_prev = " item_userid='".$owner."' && item_id < $id ";
+       $where_next = " item_userid='".$owner."' && item_id > $id ";
+       $_t_T = "num";
+    }elseif(!empty($al)){
+       $cur = $db->query("SELECT item_id, item_alias FROM $db_folio WHERE item_alias = '$al' LIMIT 1 ")->fetch();
+       $where_prev = " item_userid='".$owner."' && item_id < ".$cur['item_id'];
+       $where_next = " item_userid='".$owner."' && item_id > ".$cur['item_id']; 
+       $_t_T = "abc";
+    }
+    #$sql = $db->query(" SELECT rownumb,item_id FROM ( SELECT @rownumb := @rownumb+1 AS rownumb, item_id FROM $db_folio AS folio, (SELECT @rownumb := 0) al WHERE $where) AS src ");
+    $sql_prev = $db->query("SELECT item_id, item_alias FROM $db_folio WHERE $where_prev ORDER BY `item_id` DESC LIMIT 1 ")->fetch();
+    $sql_next = $db->query("SELECT item_id, item_alias FROM $db_folio WHERE $where_next ORDER BY `item_id` ASC LIMIT 1 ")->fetch();
+   
+    if($_t_T == "abc"){
+        $prd_prev = $sql_prev["item_alias"];
+        $prd_next = $sql_next["item_alias"];
+    }else{
+        $prd_prev = $sql_prev["item_id"];
+        $prd_next = $sql_next["item_id"];
+    }
 
 list($usr['auth_read'], $usr['auth_write'], $usr['isadmin']) = cot_auth('folio', $item['item_cat'], 'RWA');
 cot_block($usr['auth_read']);
