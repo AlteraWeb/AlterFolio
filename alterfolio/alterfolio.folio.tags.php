@@ -14,6 +14,7 @@
  * @copyright Copyright (c) AlteraWeb.ru
  * @license BSD
  */
+ defined('COT_CODE') or die('Wrong URL');
 $owner = $item["item_userid"];
 if ($id > 0) {
     $where_prev = " item_userid='" . $owner . "' && item_id < $id ";
