@@ -1,3 +1,5 @@
+<h2><a href="http://pluginspro.ru">Модули и плагины для COTONTI</a></h2>
+
 AlterFolio
 ==========
 
